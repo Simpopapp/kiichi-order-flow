@@ -13,7 +13,18 @@ interface CartProps {
 }
 
 const Cart: React.FC<CartProps> = ({ tableNumber, customerName, onOrderSent }) => {
-  const { items, updateQuantity, removeItem, clearCart, getTotalPrice } = useCart();
+  const { 
+    items, 
+    rodizioSystems, 
+    updateQuantity, 
+    updateRodizioQuantity,
+    removeItem, 
+    removeRodizioSystem,
+    removeRodizioItem,
+    clearCart, 
+    getTotalPrice,
+    getTotalItems 
+  } = useCart();
   const [isOpen, setIsOpen] = useState(false);
 
   const formatPrice = (price: number) => {
@@ -31,6 +42,21 @@ const Cart: React.FC<CartProps> = ({ tableNumber, customerName, onOrderSent }) =
     message += `Data/Hora: ${dateStr} ${timeStr}\n\n`;
     message += `ITENS DO PEDIDO:\n`;
     
+    // Add Rodizio Systems
+    rodizioSystems.forEach(system => {
+      const systemName = system.type === 'jantar' ? 'Rodízio Jantar' : 'Rodízio Almoço';
+      message += `${system.quantity}x ${systemName} (${formatPrice(system.price * system.quantity)})\n`;
+      
+      if (system.selectedItems.length > 0) {
+        message += `  Itens selecionados:\n`;
+        system.selectedItems.forEach(item => {
+          message += `  - ${item.name}${item.notes ? ` (${item.notes})` : ''}\n`;
+        });
+      }
+      message += '\n';
+    });
+    
+    // Add regular items
     items.forEach(item => {
       const itemTotal = item.price * item.quantity;
       message += `${item.quantity}x ${item.name}`;
@@ -50,7 +76,7 @@ const Cart: React.FC<CartProps> = ({ tableNumber, customerName, onOrderSent }) =
   };
 
   const handleSendOrder = () => {
-    if (items.length === 0) {
+    if (getTotalItems() === 0) {
       toast({
         title: "Carrinho vazio",
         description: "Adicione itens ao carrinho antes de enviar o pedido",
@@ -84,9 +110,9 @@ const Cart: React.FC<CartProps> = ({ tableNumber, customerName, onOrderSent }) =
       >
         <div className="relative">
           <ShoppingCart className="h-6 w-6" />
-          {items.length > 0 && (
+          {getTotalItems() > 0 && (
             <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-kiichi-gold text-kiichi-black text-xs">
-              {items.reduce((total, item) => total + item.quantity, 0)}
+              {getTotalItems()}
             </Badge>
           )}
         </div>
@@ -117,7 +143,7 @@ const Cart: React.FC<CartProps> = ({ tableNumber, customerName, onOrderSent }) =
           </CardHeader>
 
           <CardContent className="flex-1 overflow-y-auto p-4">
-            {items.length === 0 ? (
+            {getTotalItems() === 0 ? (
               <div className="text-center py-8">
                 <ShoppingCart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">Seu carrinho está vazio</p>
@@ -127,6 +153,81 @@ const Cart: React.FC<CartProps> = ({ tableNumber, customerName, onOrderSent }) =
               </div>
             ) : (
               <div className="space-y-4">
+                {/* Rodizio Systems */}
+                {rodizioSystems.map((system) => (
+                  <div key={system.id} className="border-2 border-kiichi-red/20 rounded-lg p-4 bg-kiichi-red/5">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-semibold">
+                          {system.type === 'jantar' ? 'Rodízio Jantar' : 'Rodízio Almoço'}
+                        </h4>
+                        <Badge className="bg-gradient-kiichi text-white text-xs">
+                          Sistema
+                        </Badge>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeRodizioSystem(system.id)}
+                        className="text-muted-foreground hover:text-destructive p-1"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => updateRodizioQuantity(system.id, system.quantity - 1)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="font-medium w-8 text-center">{system.quantity}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => updateRodizioQuantity(system.id, system.quantity + 1)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-kiichi-red">
+                          {formatPrice(system.price * system.quantity)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {system.selectedItems.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-kiichi-red/20">
+                        <p className="text-sm font-medium text-muted-foreground mb-2">
+                          Itens selecionados ({system.selectedItems.length}):
+                        </p>
+                        <div className="space-y-1 max-h-32 overflow-y-auto">
+                          {system.selectedItems.map((item, index) => (
+                            <div key={index} className="flex items-center justify-between text-sm bg-white/50 rounded px-2 py-1">
+                              <span className="truncate">{item.name}</span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeRodizioItem(system.id, item.name, item.categoryName)}
+                                className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive flex-shrink-0 ml-2"
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {/* Regular Items */}
                 {items.map((item) => (
                   <div key={item.id} className="border rounded-lg p-4 hover-lift transition-kiichi">
                     <div className="flex justify-between items-start mb-2">
@@ -176,7 +277,7 @@ const Cart: React.FC<CartProps> = ({ tableNumber, customerName, onOrderSent }) =
             )}
           </CardContent>
 
-          {items.length > 0 && (
+          {getTotalItems() > 0 && (
             <div className="border-t p-4 space-y-4">
               <div className="flex justify-between items-center text-xl font-bold">
                 <span>Total:</span>

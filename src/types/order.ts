@@ -5,6 +5,21 @@ export interface CartItem {
   quantity: number;
   notes?: string;
   categoryName: string;
+  type: 'regular' | 'rodizio-system';
+}
+
+export interface RodizioItem {
+  name: string;
+  categoryName: string;
+  notes?: string;
+}
+
+export interface RodizioSystem {
+  id: string;
+  type: 'jantar' | 'almoco';
+  price: number;
+  quantity: number;
+  selectedItems: RodizioItem[];
 }
 
 export interface OrderInfo {
@@ -19,5 +34,6 @@ export interface AppState {
   tableNumber: string;
   customerName: string;
   cart: CartItem[];
+  rodizioSystems: RodizioSystem[];
   currentScreen: 'table-selection' | 'name-entry' | 'menu';
 }

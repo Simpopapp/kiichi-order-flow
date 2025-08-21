@@ -18,7 +18,7 @@ interface MenuDisplayProps {
 const MenuDisplay: React.FC<MenuDisplayProps> = ({ tableNumber, customerName, onBack }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
-  const { addItem } = useCart();
+  const { addItem, addRodizioSystem, addRodizioItem, rodizioSystems } = useCart();
 
   const formatPrice = (price: number | null) => {
     if (!price || price <= 0) return '';
@@ -30,6 +30,22 @@ const MenuDisplay: React.FC<MenuDisplayProps> = ({ tableNumber, customerName, on
            item.descricao.toLowerCase().includes('consulte o garçom');
   };
 
+  const isRodizioCategory = (categoryName: string) => {
+    return categoryName.includes('Rodízio');
+  };
+
+  const isRodizioItem = (item: MenuItem, parentCategory: string) => {
+    return (
+      parentCategory.includes('Rodízio') && 
+      item.nome !== 'Sistema Rodízio' && 
+      item.nome !== 'Sistema Rodízio Almoço'
+    );
+  };
+
+  const isRodizioSystemItem = (item: MenuItem) => {
+    return item.nome === 'Sistema Rodízio' || item.nome === 'Sistema Rodízio Almoço';
+  };
+
   const isPremiumCategory = (categoryName: string) => {
     return categoryName.includes('Especiais da Casa') || 
            categoryName.includes('Drinks') || 
@@ -37,72 +53,133 @@ const MenuDisplay: React.FC<MenuDisplayProps> = ({ tableNumber, customerName, on
   };
 
   const handleAddToCart = (item: MenuItem, categoryName: string, parentCategory: string) => {
-    // For items in "Sistema Rodízio", use the system price
-    let price = 0;
-    if (item.preco && item.preco > 0) {
-      price = item.preco;
-    } else if (parentCategory === 'Rodízio Jantar') {
-      price = 189.00;
-    } else if (parentCategory === 'Rodízio Almoço') {
-      price = 119.99;
+    // Handle Rodizio System items (the main rodizio package)
+    if (isRodizioSystemItem(item)) {
+      const rodizioType = parentCategory.includes('Jantar') ? 'jantar' : 'almoco';
+      addRodizioSystem(rodizioType);
+      
+      toast({
+        title: "Rodízio adicionado!",
+        description: `${parentCategory} foi adicionado ao seu pedido`,
+      });
+      return;
     }
 
-    addItem({
-      name: item.nome,
-      price: price,
-      categoryName: categoryName,
-      notes: item.descricao
-    });
+    // Handle Rodizio items (included in rodizio, need to select a system first)
+    if (isRodizioItem(item, parentCategory)) {
+      const rodizioType = parentCategory.includes('Jantar') ? 'jantar' : 'almoco';
+      const existingSystem = rodizioSystems.find(system => system.type === rodizioType);
+      
+      if (!existingSystem) {
+        toast({
+          title: "Adicione o rodízio primeiro",
+          description: `Para selecionar itens do ${parentCategory}, você precisa adicionar o sistema de rodízio primeiro.`,
+          variant: "destructive"
+        });
+        return;
+      }
 
-    toast({
-      title: "Item adicionado!",
-      description: `${item.nome} foi adicionado ao seu pedido`,
-    });
+      addRodizioItem(existingSystem.id, {
+        name: item.nome,
+        categoryName: categoryName,
+        notes: item.descricao
+      });
+
+      toast({
+        title: "Item selecionado!",
+        description: `${item.nome} foi adicionado à sua seleção do rodízio`,
+      });
+      return;
+    }
+
+    // Handle regular items (beverages, etc.)
+    if (item.preco && item.preco > 0) {
+      addItem({
+        name: item.nome,
+        price: item.preco,
+        categoryName: categoryName,
+        notes: item.descricao,
+        type: 'regular'
+      });
+
+      toast({
+        title: "Item adicionado!",
+        description: `${item.nome} foi adicionado ao seu pedido`,
+      });
+    } else {
+      toast({
+        title: "Consulte valores",
+        description: "Por favor, consulte o garçom para este item",
+        variant: "destructive"
+      });
+    }
   };
 
-  const renderMenuItem = (item: MenuItem, categoryName: string, parentCategory: string) => (
-    <Card key={item.nome} className="hover-lift transition-kiichi shadow-elegant">
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start gap-3">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h4 className="font-semibold text-sm">{item.nome}</h4>
-              {isSpecialItem(item) && (
-                <Badge variant="secondary" className="bg-kiichi-gold text-kiichi-black text-xs">
-                  <Star className="h-3 w-3 mr-1" />
-                  Especial
-                </Badge>
+  const renderMenuItem = (item: MenuItem, categoryName: string, parentCategory: string) => {
+    const isRodizioSys = isRodizioSystemItem(item);
+    const isRodizioItm = isRodizioItem(item, parentCategory);
+    const rodizioType = parentCategory.includes('Jantar') ? 'jantar' : 'almoco';
+    const hasRodizioSystem = rodizioSystems.some(system => system.type === rodizioType);
+    
+    return (
+      <Card key={item.nome} className="hover-lift transition-kiichi shadow-elegant">
+        <CardContent className="p-4">
+          <div className="flex justify-between items-start gap-3">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h4 className="font-semibold text-sm">{item.nome}</h4>
+                {isSpecialItem(item) && (
+                  <Badge variant="secondary" className="bg-kiichi-gold text-kiichi-black text-xs">
+                    <Star className="h-3 w-3 mr-1" />
+                    Especial
+                  </Badge>
+                )}
+                {isPremiumCategory(categoryName) && (
+                  <Badge className="bg-kiichi-red text-white text-xs">
+                    Premium
+                  </Badge>
+                )}
+                {isRodizioSys && (
+                  <Badge className="bg-gradient-kiichi text-white text-xs">
+                    Sistema
+                  </Badge>
+                )}
+                {isRodizioItm && (
+                  <Badge variant="outline" className="text-xs">
+                    Incluso no Rodízio
+                  </Badge>
+                )}
+              </div>
+              {item.descricao && (
+                <p className="text-xs text-muted-foreground mb-2">{item.descricao}</p>
               )}
-              {isPremiumCategory(categoryName) && (
-                <Badge className="bg-kiichi-red text-white text-xs">
-                  Premium
-                </Badge>
-              )}
+              <div className="flex items-center justify-between">
+                {item.preco && item.preco > 0 ? (
+                  <p className="font-bold text-kiichi-red">{formatPrice(item.preco)}</p>
+                ) : isRodizioItm ? (
+                  <p className="text-sm text-muted-foreground">Incluso no rodízio</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Consulte valores</p>
+                )}
+              </div>
             </div>
-            {item.descricao && (
-              <p className="text-xs text-muted-foreground mb-2">{item.descricao}</p>
-            )}
-            <div className="flex items-center justify-between">
-              {item.preco && item.preco > 0 ? (
-                <p className="font-bold text-kiichi-red">{formatPrice(item.preco)}</p>
-              ) : parentCategory.includes('Rodízio') ? (
-                <p className="text-sm text-muted-foreground">Incluso no rodízio</p>
-              ) : (
-                <p className="text-sm text-muted-foreground">Consulte valores</p>
-              )}
-            </div>
+            <Button
+              size="sm"
+              onClick={() => handleAddToCart(item, categoryName, parentCategory)}
+              className={`transition-kiichi hover-scale shrink-0 ${
+                isRodizioItm && !hasRodizioSystem 
+                  ? 'bg-gray-400 hover:bg-gray-500' 
+                  : 'bg-kiichi-red hover:bg-kiichi-red-dark'
+              }`}
+              disabled={isRodizioItm && !hasRodizioSystem}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
-          <Button
-            size="sm"
-            onClick={() => handleAddToCart(item, categoryName, parentCategory)}
-            className="bg-kiichi-red hover:bg-kiichi-red-dark transition-kiichi hover-scale shrink-0"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
+        </CardContent>
+      </Card>
+    );
+  };
 
   const renderSubcategory = (subcategory: MenuSubcategory, parentCategory: string) => (
     <div key={subcategory.nome} className="mb-8">
