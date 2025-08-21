@@ -1,13 +1,54 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React, { useState } from 'react';
+import TableSelection from '@/components/TableSelection';
+import NameEntry from '@/components/NameEntry';
+import MenuDisplay from '@/components/MenuDisplay';
 
 const Index = () => {
+  const [currentScreen, setCurrentScreen] = useState<'table-selection' | 'name-entry' | 'menu'>('table-selection');
+  const [tableNumber, setTableNumber] = useState('');
+  const [customerName, setCustomerName] = useState('');
+
+  const handleTableSelected = (table: string) => {
+    setTableNumber(table);
+    setCurrentScreen('name-entry');
+  };
+
+  const handleNameEntered = (name: string) => {
+    setCustomerName(name);
+    setCurrentScreen('menu');
+  };
+
+  const handleBackToTableSelection = () => {
+    setCurrentScreen('table-selection');
+    setTableNumber('');
+    setCustomerName('');
+  };
+
+  const handleBackToNameEntry = () => {
+    setCurrentScreen('name-entry');
+    setCustomerName('');
+  };
+
+  if (currentScreen === 'table-selection') {
+    return <TableSelection onTableSelected={handleTableSelected} />;
+  }
+
+  if (currentScreen === 'name-entry') {
+    return (
+      <NameEntry 
+        tableNumber={tableNumber}
+        onNameEntered={handleNameEntered}
+        onBack={handleBackToTableSelection}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <MenuDisplay 
+      tableNumber={tableNumber}
+      customerName={customerName}
+      onBack={handleBackToNameEntry}
+    />
   );
 };
 

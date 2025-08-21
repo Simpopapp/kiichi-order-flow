@@ -1,99 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto:wght@300;400;500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
+/* Kiichi Design System - Elegant Japanese Restaurant */
 @layer base {
   :root {
+    /* Core Brand Colors - Kiichi Palette */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 0%;
 
+    /* Kiichi Brand Colors */
+    --kiichi-red: 356 66% 51%;        /* #D32F2F - Primary red */
+    --kiichi-red-dark: 356 80% 35%;   /* Darker red for depths */
+    --kiichi-black: 0 0% 0%;          /* Pure black */
+    --kiichi-white: 0 0% 100%;        /* Pure white */
+    --kiichi-gray: 0 0% 26%;          /* #424242 - Cards background */
+    --kiichi-gray-light: 0 0% 85%;    /* Light gray for borders */
+    --kiichi-gold: 51 100% 50%;       /* #FFD700 - Premium accent */
+
+    /* Semantic Colors */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 0%;
+    --card-dark: 0 0% 8%;             /* Dark cards */
+    --card-dark-foreground: 0 0% 100%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 0%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: var(--kiichi-red);
+    --primary-foreground: var(--kiichi-white);
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: var(--kiichi-gray);
+    --secondary-foreground: var(--kiichi-white);
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: var(--kiichi-gold);
+    --accent-foreground: var(--kiichi-black);
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: var(--kiichi-gray-light);
+    --input: 0 0% 95%;
+    --ring: var(--kiichi-red);
 
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Gradients for Backgrounds */
+    --gradient-kiichi: linear-gradient(135deg, hsl(var(--kiichi-red)) 0%, hsl(var(--kiichi-red-dark)) 30%, hsl(var(--kiichi-black)) 100%);
+    --gradient-kiichi-subtle: linear-gradient(180deg, hsl(var(--kiichi-black)) 0%, hsl(var(--kiichi-gray)) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(var(--kiichi-gold)) 0%, #ffa726 100%);
+    
+    /* Shadows with Kiichi Colors */
+    --shadow-kiichi: 0 10px 30px -10px hsl(var(--kiichi-red) / 0.3);
+    --shadow-elegant: 0 4px 20px -4px hsl(var(--kiichi-black) / 0.25);
+    --shadow-floating: 0 8px 32px -8px hsl(var(--kiichi-black) / 0.4);
+    
+    /* Transitions */
+    --transition-kiichi: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Dark mode not needed for this project - focusing on light mode only */
   }
 }
 
+/* Typography */
 @layer base {
   * {
     @apply border-border;
@@ -101,5 +76,144 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+  }
+}
+
+/* Custom Kiichi Components */
+@layer components {
+  /* Gradient Backgrounds */
+  .bg-gradient-kiichi {
+    background: var(--gradient-kiichi);
+  }
+  
+  .bg-gradient-kiichi-subtle {
+    background: var(--gradient-kiichi-subtle);
+  }
+  
+  .bg-gradient-gold {
+    background: var(--gradient-gold);
+  }
+
+  /* Kiichi Shadows */
+  .shadow-kiichi {
+    box-shadow: var(--shadow-kiichi);
+  }
+  
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+  
+  .shadow-floating {
+    box-shadow: var(--shadow-floating);
+  }
+
+  /* Japanese Design Elements */
+  .wave-pattern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'%3E%3Cpath d='M20 20c0-11.046-8.954-20-20-20v40c11.046 0 20-8.954 20-20z'/%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* Transitions */
+  .transition-kiichi {
+    transition: var(--transition-kiichi);
+  }
+  
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+
+  /* Hover Effects */
+  .hover-lift {
+    @apply transition-kiichi;
+    transform: translateY(0);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px);
+  }
+
+  .hover-scale {
+    @apply transition-kiichi;
+    transform: scale(1);
+  }
+  
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 20px hsl(var(--kiichi-red) / 0.4);
+  }
+}
+
+/* Animations */
+@layer utilities {
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes bounceIn {
+    from {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slideInUp 0.6s ease-out;
+  }
+
+  .animate-slide-right {
+    animation: slideInRight 0.4s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .animate-bounce-in {
+    animation: bounceIn 0.4s ease-out;
   }
 }

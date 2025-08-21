@@ -24,6 +24,16 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				
+				// Kiichi Brand Colors
+				'kiichi-red': 'hsl(var(--kiichi-red))',
+				'kiichi-red-dark': 'hsl(var(--kiichi-red-dark))',
+				'kiichi-black': 'hsl(var(--kiichi-black))',
+				'kiichi-white': 'hsl(var(--kiichi-white))',
+				'kiichi-gray': 'hsl(var(--kiichi-gray))',
+				'kiichi-gray-light': 'hsl(var(--kiichi-gray-light))',
+				'kiichi-gold': 'hsl(var(--kiichi-gold))',
+				
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
@@ -50,17 +60,9 @@ export default {
 				},
 				card: {
 					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
-				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+					foreground: 'hsl(var(--card-foreground))',
+					dark: 'hsl(var(--card-dark))',
+					'dark-foreground': 'hsl(var(--card-dark-foreground))'
 				}
 			},
 			borderRadius: {
